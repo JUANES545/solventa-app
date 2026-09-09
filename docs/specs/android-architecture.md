@@ -73,6 +73,9 @@ The UI observes an immutable `UiState` through `StateFlow` and emits typed user 
 - Logs must not include passwords, OTPs, document numbers, tokens, or consent payloads.
 - Sensitive fields use appropriate keyboard and visual-transformation settings.
 - Runtime permissions are requested only at the moment a related action is selected, with a clear rationale and denial path.
+- Evidence uses Android Photo Picker and persists only local content URIs needed for the current prototype flow; no upload is performed.
+- Location uses the Android location permission and device location provider. Permission denial falls back to manual entry or a documented demo location.
+- Fake repositories receive the current debug scenario through an injected scenario provider. Composables never branch on test scenarios.
 
 ## Localization
 
@@ -80,3 +83,11 @@ The UI observes an immutable `UiState` through `StateFlow` and emits typed user 
 - Customer-facing copy lives in string resources, including accessibility and error text.
 - Dates, times, numbers, and COP amounts use locale-aware formatters.
 - Language selection uses Android-supported application locales and persists across launches.
+- Appearance supports system default, light, and dark preferences, persisted locally.
+
+## Device target
+
+- Phone layouts only.
+- The main activity is locked to portrait for this prototype.
+- Layouts avoid fixed screen dimensions and remain usable across supported phone sizes, densities, and increased font scales.
+- Tablet, landscape, and foldable-specific layouts are outside the current scope.

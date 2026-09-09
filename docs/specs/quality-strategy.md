@@ -3,8 +3,8 @@
 ## Test layers
 
 - **Unit tests:** ViewModel state transitions, validation, filtering, fake scenarios, and formatting rules.
-- **Compose UI tests:** authentication entry, complete quote-to-issuance flow, new claim submission, bottom navigation, and language switching.
-- **Manual exploratory checks:** TalkBack, 200% font scale, keyboard behavior, back navigation, rotation/configuration change, empty/error scenarios, and dark-theme contrast.
+- **Compose UI tests:** demo authentication, complete travel quote-to-claim flow, new claim submission, bottom navigation, language switching, and theme switching.
+- **Manual exploratory checks:** TalkBack, 200% font scale, keyboard behavior, back navigation, Photo Picker, location permission granted/denied, emulator location, empty/error scenarios, and light/dark contrast.
 
 ## Required scenarios
 
@@ -42,3 +42,5 @@ Connected tests require an emulator or device and should be reported separately 
 - Fake data remains coherent across Home, Policies, Claims, and Notifications.
 - The demonstration can be completed without network access.
 - Simulated operations are visibly identified and do not mislead the user.
+- The release build contains no route or entry point for the Test scenarios panel.
+- The main activity remains portrait while layouts work across supported phone sizes and font scales.

@@ -19,17 +19,30 @@ An authenticated customer or policyholder who wants to quote, purchase, and mana
 | Quote | Product selection, relevant questions, consent, calculation, plan comparison | Delayed calculation with deterministic results |
 | Purchase | Quote summary, payment method, data confirmation, OTP, policy issuance | Simulated payment and issuance confirmation |
 | Policies | Status filters, details, coverage, validity, premium, document, renewal/cancellation | Simulated actions with visible confirmation |
-| Claims | Claim list/detail, affected policy, event description, evidence, location, submission | Device picker may be used; no upload occurs |
+| Claims | Claim list/detail, affected policy, event description, Photo Picker evidence, device/manual location, submission | Local device interactions; no upload occurs |
 | Notifications | Payment, expiration, claim status, adjuster, nearby provider | Local read/unread state |
 | Profile | Customer data, notification preferences, language, accessibility, logout | Local settings for the prototype session |
 
 ## Insurance products
 
-The prototype may display vehicle, home, and life products. One product should provide the complete quote-to-issuance demonstration flow; the remaining products may reuse the flow with adjusted questions and sample coverage. The product selected for the complete flow remains an approval decision.
+The current product catalog is travel, life, device, and parametric insurance. Travel insurance provides the complete demonstration flow:
+
+`Quote → Plan selection → Consent → Simulated payment → Simulated OTP signature → Issuance → Policy detail → Claim report`
+
+The other products may appear through coherent simulated catalog, quote, policy, and notification data, but do not require the same interaction depth.
+
+The issued sample travel policy is named **International Travel**. Claim history and the new-claim flow must use the same policy so cross-screen data remains coherent.
 
 ## Simulation contract
 
 Every primary action must produce a visible result. Simulations must never imply that a real payment, identity verification, emergency call, policy issuance, cancellation, or claim submission occurred. No real endpoints, secrets, or provider credentials are permitted.
+
+## Demo account
+
+- Email: `demo@solventa.co`
+- Password: `Solventa123`
+
+Login also provides an **Enter as test user** action. Authentication is handled by a fake repository and covers incomplete input, incorrect credentials, loading, success, and recoverable login error.
 
 ## Definition of the prototype boundary
 

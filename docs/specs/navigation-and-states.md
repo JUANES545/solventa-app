@@ -20,7 +20,10 @@ Main
 ├── Policies → Policy detail → Simulated action result
 ├── Claims → Claim detail / New claim → Confirmation
 ├── Notifications → Notification detail
-└── Profile → Preferences / Language / Accessibility
+└── Profile → Preferences / Language / Appearance / Accessibility
+
+Debug build only
+└── Test scenarios
 ```
 
 ## Navigation rules
@@ -47,6 +50,8 @@ Forms additionally support initial, editing, invalid, submitting, and submitted 
 ## Demo controls
 
 Empty and error examples must be deterministic and easy to activate for exploratory testing. The mechanism may be a debug-only scenario selector or injected fake repository configuration; it must not appear as a production customer feature.
+
+The selected implementation is a **Test scenarios** panel compiled only in debug builds. It configures fake repositories and supports normal data, empty lists, simulated network error, slow response, expired session, successful claim submission, and failed claim submission. Scenario checks must not appear in composables.
 
 ## State preservation
 

@@ -2,9 +2,7 @@
 
 ## Visual direction
 
-Solventa uses a premium corporate dark theme: deep navy creates trust and financial seriousness, while electric cyan is reserved for high-value actions. The interface must remain calm and readable rather than appearing like a gaming or cryptocurrency product.
-
-This direction supersedes the earlier light-background suggestion for the mobile prototype. A light theme is not assumed unless it is approved as additional scope.
+Solventa supports complete light and dark themes. The light theme is the primary presentation and preserves the existing identity of clear backgrounds, dark blue, green confirmations, and red alerts. The dark theme uses the premium corporate direction: deep navy creates trust and financial seriousness, while electric cyan is reserved for high-value actions. The initial preference follows the Android system setting, and the customer may select system, light, or dark in Settings.
 
 ## Dark color tokens
 
@@ -21,11 +19,30 @@ This direction supersedes the earlier light-background suggestion for the mobile
 | `warning` | Insurance Gold | `#F59E0B` | Expiration, review required, pending attention |
 | `error` | Accessible Red | `#F87171` | Validation errors, failed operations, critical claim alerts |
 
-Colors are semantic tokens, not values written directly inside feature composables. A light scheme may be designed later, but the prototype target is the dark scheme.
+Colors are semantic tokens, not values written directly inside feature composables. Both complete schemes are required, with the light scheme serving as the primary visual reference.
+
+## Light color tokens
+
+| Token | Color | Hex | Intended use |
+| --- | --- | --- | --- |
+| `background` | Clear Ice | `#F7F9FC` | Primary light background |
+| `surface` | Pure White | `#FFFFFF` | Cards, sheets, and inputs |
+| `surfaceVariant` | Mist Blue | `#E8EEF6` | Grouping and secondary containers |
+| `outline` | Steel Blue Gray | `#64748B` | Input and component borders |
+| `onBackground` | Deep Navy | `#0B1F3A` | Primary text |
+| `onSurfaceVariant` | Slate | `#475569` | Secondary text |
+| `primary` | Corporate Navy | `#123B6D` | Standard primary actions and navigation |
+| `conversion` | Accessible Cyan Blue | `#007FA3` | High-value conversion actions on light surfaces |
+| `onPrimary` | Pure White | `#FFFFFF` | Text/icons on navy and accessible cyan buttons |
+| `success` | Deep Emerald | `#047857` | Positive status and confirmation |
+| `warning` | Deep Amber | `#B45309` | Expiration and attention states |
+| `error` | Insurance Red | `#B42318` | Errors, destructive actions, and critical alerts |
+
+All foreground/background pairings must be verified rather than assuming the same semantic shade works in both themes.
 
 ## Usage rules
 
-- Electric cyan is limited to primary conversion actions such as Quote, Buy Insurance, Download Policy, or Call Emergency Assistance.
+- Cyan is limited to high-value conversion actions such as Quote, Buy Insurance, Download Policy, or Call Emergency Assistance. The light theme uses its darker accessible variant for sufficient contrast.
 - Cyan must not become a decorative background or general-purpose text color.
 - Focused inputs change from `outline` to `primary`; focus also remains identifiable through stroke and label changes.
 - Success, warning, and error colors communicate status together with text and/or iconography.
