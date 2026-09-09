@@ -20,3 +20,7 @@ This repository will contain the Android client application developed with Kotli
 ## Status
 
 Planning and discovery. Application development has not started yet.
+
+## Specifications
+
+The product, navigation, architecture, design, quality, and Git workflow decisions are maintained in [docs/specs](docs/specs/README.md). The initial specification set is currently under review.
