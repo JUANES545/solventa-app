@@ -39,7 +39,7 @@ fun SolventaApp(settingsViewModel: SettingsViewModel) {
 
     NavHost(navController = nav, startDestination = Route.WELCOME) {
         composable(Route.WELCOME) { WelcomeScreen({ nav.navigate(Route.LOGIN) }, { nav.navigate(Route.REGISTER) }) }
-        composable(Route.LOGIN) { LoginScreen(authViewModel, { enterMain(nav) }, { nav.navigate(Route.RECOVERY) }, { nav.navigate(Route.REGISTER) }, { if (BuildConfig.DEBUG) nav.navigate(Route.SCENARIOS) }) }
+        composable(Route.LOGIN) { LoginScreen(authViewModel, nav::popBackStack, { enterMain(nav) }, { nav.navigate(Route.RECOVERY) }, { nav.navigate(Route.REGISTER) }, { if (BuildConfig.DEBUG) nav.navigate(Route.SCENARIOS) }) }
         composable(Route.RECOVERY) { RecoveryScreen(nav::popBackStack) }
         composable(Route.REGISTER) { RegistrationScreen(nav::popBackStack) { nav.navigate(Route.TERMS) } }
         composable(Route.TERMS) { TermsScreen(nav::popBackStack) { nav.navigate(Route.KYC) } }

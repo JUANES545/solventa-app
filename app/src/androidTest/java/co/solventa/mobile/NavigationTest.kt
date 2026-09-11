@@ -2,6 +2,7 @@ package co.solventa.mobile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,5 +19,23 @@ class NavigationTest {
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.sign_in)).performClick()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.email)).assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.test_user_login)).assertIsDisplayed()
+    }
+
+    @Test
+    fun emptyLoginShowsCorrectiveMessage() {
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.sign_in)).performClick()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.sign_in)).performClick()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.required_fields_error)).assertIsDisplayed()
+    }
+
+    @Test
+    fun testUserLoginNavigatesHome() {
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.sign_in)).performClick()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.test_user_login)).performClick()
+        val homeGreeting = composeRule.activity.getString(R.string.hello_user)
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(homeGreeting).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithText(homeGreeting).assertExists().assertIsDisplayed()
     }
 }
