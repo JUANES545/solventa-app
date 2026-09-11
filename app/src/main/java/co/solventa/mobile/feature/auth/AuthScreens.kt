@@ -1,10 +1,17 @@
 package co.solventa.mobile.feature.auth
 
 import androidx.compose.foundation.background
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -25,8 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
@@ -40,13 +50,43 @@ import co.solventa.mobile.core.ui.*
 
 @Composable
 fun WelcomeScreen(onLogin: () -> Unit, onRegister: () -> Unit) {
+    val backgroundMotion = rememberInfiniteTransition(label = "welcome background")
+    val drift by backgroundMotion.animateFloat(
+        initialValue = -1f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 16_000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "background drift"
+    )
+    val density = LocalDensity.current
+    val horizontalDrift = with(density) { 22.dp.toPx() }
+    val verticalDrift = with(density) { 14.dp.toPx() }
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Box {
             Box(
                 Modifier
                     .size(280.dp)
                     .offset(x = 190.dp, y = (-70).dp)
+                    .graphicsLayer {
+                        translationX = drift * horizontalDrift
+                        translationY = drift * verticalDrift
+                        scaleX = 1f + (drift * 0.025f)
+                        scaleY = scaleX
+                    }
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.07f), CircleShape)
+            )
+            Box(
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .size(190.dp)
+                    .offset(x = (-105).dp, y = 65.dp)
+                    .graphicsLayer {
+                        translationX = -drift * horizontalDrift
+                        translationY = -drift * verticalDrift
+                    }
+                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.045f), CircleShape)
             )
             Column(
                 Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 28.dp, vertical = 24.dp),
@@ -216,23 +256,20 @@ fun LoginScreen(
                 enabled = !state.loading,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
             ) { Text(stringResource(R.string.test_user_login)) }
-            Text(
-                stringResource(R.string.demo_credentials),
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
             TextButton(onClick = onAuthenticated, enabled = !state.loading, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Icon(Icons.Rounded.Fingerprint, null)
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.biometric_access))
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.no_account), style = MaterialTheme.typography.bodyMedium)
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    stringResource(R.string.no_account),
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
                 TextButton(onClick = onRegister, enabled = !state.loading) { Text(stringResource(R.string.create_account)) }
             }
-            SimulationNotice()
             if (co.solventa.mobile.BuildConfig.DEBUG) {
                 TextButton(onClick = onScenarios, enabled = !state.loading, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     Icon(Icons.Rounded.BugReport, null)
@@ -319,8 +356,20 @@ fun TermsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
     var terms by rememberSaveable { mutableStateOf(false) }
     var finance by rememberSaveable { mutableStateOf(false) }
     SolventaScreen(R.string.terms_title, onBack) {
-        Row(verticalAlignment = Alignment.Top) { Checkbox(terms, { terms = it }); Text(stringResource(R.string.accept_terms), Modifier.padding(top = 12.dp)) }
-        Row(verticalAlignment = Alignment.Top) { Checkbox(finance, { finance = it }); Text(stringResource(R.string.open_finance_consent), Modifier.padding(top = 12.dp)) }
+        Row(
+            Modifier.fillMaxWidth().toggleable(terms, role = Role.Checkbox, onValueChange = { terms = it }).padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(terms, null)
+            Text(stringResource(R.string.accept_terms), Modifier.padding(start = 8.dp))
+        }
+        Row(
+            Modifier.fillMaxWidth().toggleable(finance, role = Role.Checkbox, onValueChange = { finance = it }).padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(finance, null)
+            Text(stringResource(R.string.open_finance_consent), Modifier.padding(start = 8.dp))
+        }
         PrimaryButton(R.string.continue_action, onContinue, terms)
     }
 }

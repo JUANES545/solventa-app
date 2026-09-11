@@ -1,6 +1,8 @@
 package co.solventa.mobile.feature.quote
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.*
@@ -9,7 +11,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.solventa.mobile.R
 import co.solventa.mobile.core.ui.*
@@ -21,11 +27,16 @@ fun ProductScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onTravel: () ->
     SolventaScreen(R.string.quote_title, onBack) {
         SectionTitle(R.string.choose_product)
         InsuranceProduct.entries.forEach { product ->
+            val selected = state.product == product
             ElevatedCard(
-                onClick = { viewModel.setProduct(product) },
-                colors = CardDefaults.elevatedCardColors(containerColor = if (state.product == product) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface),
-                modifier = Modifier.fillMaxWidth()
-            ) { Row(Modifier.fillMaxWidth().padding(18.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(productLabel(product), fontWeight = FontWeight.SemiBold); if (state.product == product) Icon(Icons.Rounded.CheckCircle, null) } }
+                colors = CardDefaults.elevatedCardColors(containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface),
+                modifier = Modifier.fillMaxWidth().selectable(selected = selected, role = Role.RadioButton, onClick = { viewModel.setProduct(product) })
+            ) {
+                Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(productLabel(product), Modifier.weight(1f).padding(end = 12.dp), fontWeight = FontWeight.SemiBold)
+                    if (selected) Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.primary)
+                }
+            }
         }
         Text(stringResource(if (state.product == InsuranceProduct.TRAVEL) R.string.travel_complete_flow else R.string.short_flow_notice), color = MaterialTheme.colorScheme.onSurfaceVariant)
         PrimaryButton(R.string.continue_action, onTravel, state.product == InsuranceProduct.TRAVEL)
@@ -66,13 +77,16 @@ fun PlansScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onContinue: () ->
             LoadState.Loading -> LoadingState()
             is LoadState.Error -> LoadError(plans.kind, viewModel::loadPlans)
             is LoadState.Content -> plans.data.forEach { plan ->
+                val selected = state.selectedPlan?.id == plan.id
                 ElevatedCard(
-                    onClick = { viewModel.selectPlan(plan) },
-                    colors = CardDefaults.elevatedCardColors(containerColor = if (state.selectedPlan?.id == plan.id) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface),
-                    modifier = Modifier.fillMaxWidth()
+                    colors = CardDefaults.elevatedCardColors(containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface),
+                    modifier = Modifier.fillMaxWidth().selectable(selected = selected, role = Role.RadioButton, onClick = { viewModel.selectPlan(plan) })
                 ) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(planLabel(plan.level), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold); Text(formatCop(plan.priceCop), style = MaterialTheme.typography.titleMedium) }
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(planLabel(plan.level), Modifier.weight(1f).padding(end = 12.dp), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            Text(formatCop(plan.priceCop), style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.End)
+                        }
                         Text(stringResource(R.string.medical_coverage, formatCop(plan.medicalCoverageCop)))
                         Text(stringResource(R.string.baggage_coverage, formatCop(plan.baggageCoverageCop)))
                     }
@@ -90,7 +104,13 @@ fun QuoteConsentScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onContinue
     var attempted by rememberSaveable { mutableStateOf(false) }
     SolventaScreen(R.string.quote_consent_title, onBack) {
         Text(stringResource(R.string.quote_consent_body))
-        Row(verticalAlignment = Alignment.Top) { Checkbox(state.consent, viewModel::setConsent); Text(stringResource(R.string.open_finance_consent), Modifier.padding(top = 12.dp)) }
+        Row(
+            Modifier.fillMaxWidth().toggleable(state.consent, role = Role.Checkbox, onValueChange = viewModel::setConsent).padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(state.consent, null)
+            Text(stringResource(R.string.open_finance_consent), Modifier.padding(start = 8.dp))
+        }
         if (attempted && !state.consent) ErrorMessage(R.string.consent_required)
         PrimaryButton(R.string.continue_action, { attempted = true; if (state.consent) onContinue() })
     }
@@ -102,8 +122,8 @@ fun PaymentScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onContinue: () 
     SolventaScreen(R.string.payment_title, onBack) {
         SimulationNotice()
         state.selectedPlan?.let { Text("${planLabel(it.level)} · ${formatCop(it.priceCop)}", style = MaterialTheme.typography.headlineSmall) }
-        ElevatedCard(onClick = { viewModel.setPaymentSelected(true) }, modifier = Modifier.fillMaxWidth()) {
-            Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { RadioButton(state.paymentSelected, { viewModel.setPaymentSelected(true) }); Text(stringResource(R.string.payment_method)) }
+        ElevatedCard(modifier = Modifier.fillMaxWidth().selectable(selected = state.paymentSelected, role = Role.RadioButton, onClick = { viewModel.setPaymentSelected(true) })) {
+            Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { RadioButton(state.paymentSelected, null); Text(stringResource(R.string.payment_method), Modifier.padding(start = 8.dp)) }
         }
         Text(stringResource(R.string.payment_disclaimer), color = MaterialTheme.colorScheme.onSurfaceVariant)
         PrimaryButton(R.string.continue_action, onContinue, state.paymentSelected)
@@ -116,7 +136,14 @@ fun OtpScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onIssued: () -> Uni
     LaunchedEffect(state.issuedPolicy) { if (state.issuedPolicy != null) onIssued() }
     SolventaScreen(R.string.otp_title, onBack) {
         SimulationNotice(); Text(stringResource(R.string.otp_help))
-        OutlinedTextField(state.otp, viewModel::setOtp, label = { Text(stringResource(R.string.otp_code)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        OutlinedTextField(
+            state.otp,
+            { value -> viewModel.setOtp(value.filter(Char::isDigit).take(6)) },
+            label = { Text(stringResource(R.string.otp_code)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
         if (state.error != null) ErrorMessage(if (state.error == ErrorKind.SUBMISSION) R.string.invalid_otp else R.string.network_error)
         if (state.issuing) LoadingState() else PrimaryButton(R.string.issue_policy, viewModel::issue, state.otp.length == 6)
     }
@@ -124,9 +151,11 @@ fun OtpScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onIssued: () -> Uni
 
 @Composable
 fun IssuedScreen(onPolicy: () -> Unit) {
-    Column(Modifier.fillMaxSize().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(72.dp))
-        Spacer(Modifier.height(20.dp)); Text(stringResource(R.string.policy_issued), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.issued_reference)); Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.view_policy, onPolicy); Spacer(Modifier.height(16.dp)); SimulationNotice()
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(Modifier.fillMaxSize().systemBarsPadding().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(72.dp))
+            Spacer(Modifier.height(20.dp)); Text(stringResource(R.string.policy_issued), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.issued_reference), textAlign = TextAlign.Center); Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.view_policy, onPolicy); Spacer(Modifier.height(16.dp)); SimulationNotice()
+        }
     }
 }

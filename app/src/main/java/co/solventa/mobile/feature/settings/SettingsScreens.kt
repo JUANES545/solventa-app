@@ -1,16 +1,21 @@
 package co.solventa.mobile.feature.settings
 
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
@@ -27,18 +32,33 @@ fun ProfileScreen(viewModel: SettingsViewModel, onLogout: () -> Unit, onScenario
     var claimNotifications by remember { mutableStateOf(true) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(stringResource(R.string.profile), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        ElevatedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp)) { Text(stringResource(R.string.customer_name), style = MaterialTheme.typography.titleLarge); Text(stringResource(R.string.customer_email), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+        ElevatedCard(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+                Surface(Modifier.size(48.dp), shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer) {
+                    Box(contentAlignment = Alignment.Center) { Icon(Icons.Rounded.Person, null, tint = MaterialTheme.colorScheme.primary) }
+                }
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.customer_name), style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.customer_email), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
         SectionTitle(R.string.settings)
         SectionTitle(R.string.language)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = { AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("es")) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.spanish)) }
             OutlinedButton(onClick = { AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en")) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.english)) }
         }
         SectionTitle(R.string.appearance)
         ThemePreference.entries.forEach { value ->
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(settings.theme == value, { viewModel.setTheme(value) })
-                Text(stringResource(when (value) { ThemePreference.SYSTEM -> R.string.system_theme; ThemePreference.LIGHT -> R.string.light_theme; ThemePreference.DARK -> R.string.dark_theme }))
+            val selected = settings.theme == value
+            Row(
+                Modifier.fillMaxWidth().heightIn(min = 52.dp).selectable(selected = selected, role = Role.RadioButton, onClick = { viewModel.setTheme(value) }),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(selected, null)
+                Text(stringResource(when (value) { ThemePreference.SYSTEM -> R.string.system_theme; ThemePreference.LIGHT -> R.string.light_theme; ThemePreference.DARK -> R.string.dark_theme }), Modifier.padding(start = 8.dp))
             }
         }
         SectionTitle(R.string.notification_preferences)
@@ -60,7 +80,10 @@ fun ProfileScreen(viewModel: SettingsViewModel, onLogout: () -> Unit, onScenario
 
 @Composable
 private fun SettingSwitch(label: Int, checked: Boolean, onChecked: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(label), Modifier.weight(1f)); Switch(checked, onChecked)
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 56.dp).toggleable(checked, role = Role.Switch, onValueChange = onChecked),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(stringResource(label), Modifier.weight(1f).padding(end = 12.dp)); Switch(checked, null)
     }
 }

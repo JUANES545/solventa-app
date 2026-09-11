@@ -1,45 +1,69 @@
 package co.solventa.mobile.feature.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import co.solventa.mobile.core.designsystem.SolventaStatusColors
 import co.solventa.mobile.R
 import co.solventa.mobile.core.ui.*
 import co.solventa.mobile.domain.*
 import kotlinx.coroutines.launch
 
-data class BottomDestination(val route: String, val label: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector)
+data class BottomDestination(val route: String, val label: Int, val accessibilityLabel: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
 val bottomDestinations = listOf(
-    BottomDestination("home", R.string.home, Icons.Rounded.Home),
-    BottomDestination("policies", R.string.policies, Icons.Rounded.Shield),
-    BottomDestination("claims", R.string.claims, Icons.Rounded.ReportProblem),
-    BottomDestination("notifications", R.string.notifications, Icons.Rounded.Notifications),
-    BottomDestination("profile", R.string.profile, Icons.Rounded.Person)
+    BottomDestination("home", R.string.home, R.string.home, Icons.Rounded.Home),
+    BottomDestination("policies", R.string.policies, R.string.policies, Icons.Rounded.Shield),
+    BottomDestination("claims", R.string.nav_claims, R.string.claims, Icons.Rounded.ReportProblem),
+    BottomDestination("notifications", R.string.nav_notifications, R.string.notifications, Icons.Rounded.Notifications),
+    BottomDestination("profile", R.string.profile, R.string.profile, Icons.Rounded.Person)
 )
 
 @Composable
 fun MainScaffold(currentRoute: String, navigate: (String) -> Unit, content: @Composable (PaddingValues) -> Unit) {
+    val showNavigationLabels = LocalDensity.current.fontScale < 1.6f
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer, tonalElevation = 0.dp) {
                 bottomDestinations.forEach { destination ->
+                    val accessibilityLabel = stringResource(destination.accessibilityLabel)
                     NavigationBarItem(
                         selected = currentRoute == destination.route,
                         onClick = { navigate(destination.route) },
-                        icon = { Icon(destination.icon, null) },
-                        label = { Text(stringResource(destination.label)) },
-                        alwaysShowLabel = false
+                        icon = { Icon(destination.icon, if (showNavigationLabels) null else accessibilityLabel) },
+                        label = if (showNavigationLabels) {
+                            {
+                                Text(
+                                    stringResource(destination.label),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        } else null,
+                        alwaysShowLabel = true
                     )
                 }
             }
@@ -112,9 +136,14 @@ fun PoliciesScreen(state: LoadState<List<Policy>>, onPolicy: (String) -> Unit, o
 fun PolicyCard(policy: Policy, onClick: () -> Unit) {
     ElevatedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(productName(policy.product), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text(policyStatusName(policy.status), style = MaterialTheme.typography.labelMedium, color = if (policy.status == PolicyStatus.EXPIRED) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    productName(policy.product),
+                    modifier = Modifier.weight(1f).padding(end = 12.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                PolicyStatusPill(policy.status)
             }
             Text(policy.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(formatCop(policy.premiumCop), style = MaterialTheme.typography.titleLarge)
@@ -146,7 +175,7 @@ fun PolicyDetailScreen(policy: Policy, onBack: () -> Unit, onNewClaim: () -> Uni
 @Composable
 fun ClaimsScreen(state: LoadState<List<Claim>>, onNew: () -> Unit, onClaim: (String) -> Unit, onRetry: () -> Unit) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(stringResource(R.string.claims), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold); FilledIconButton(onClick = onNew) { Icon(Icons.Rounded.Add, stringResource(R.string.new_claim)) } } }
+        item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) { Text(stringResource(R.string.claims), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold); FilledIconButton(onClick = onNew) { Icon(Icons.Rounded.Add, stringResource(R.string.new_claim)) } } }
         when (state) {
             LoadState.Loading -> item { LoadingState() }
             LoadState.Empty -> item { EmptyState(R.string.empty_claims); PrimaryButton(R.string.new_claim, onNew) }
@@ -192,17 +221,52 @@ fun NotificationsScreen(state: LoadState<List<SolventaNotification>>, onRead: (S
 
 @Composable
 private fun NotificationRow(notification: SolventaNotification, onRead: (() -> Unit)?) {
-    if (onRead == null) ElevatedCard(modifier = Modifier.fillMaxWidth()) { NotificationContent(notification) }
-    else ElevatedCard(onClick = onRead, modifier = Modifier.fillMaxWidth()) { NotificationContent(notification) }
+    val stateLabel = stringResource(if (notification.read) R.string.notification_read else R.string.notification_unread)
+    val modifier = Modifier.fillMaxWidth().semantics { stateDescription = stateLabel }
+    if (onRead == null) ElevatedCard(modifier = modifier) { NotificationContent(notification, false) }
+    else ElevatedCard(onClick = onRead, modifier = modifier) { NotificationContent(notification, true) }
 }
 
 @Composable
-private fun NotificationContent(notification: SolventaNotification) {
-        Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (!notification.read) Badge()
-            Column(Modifier.weight(1f)) { Text(notificationName(notification.type), fontWeight = if (notification.read) FontWeight.Normal else FontWeight.Bold); Text(formatDate(notification.createdAt), style = MaterialTheme.typography.bodySmall) }
-            if (!notification.read) Text(stringResource(R.string.mark_read), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+private fun NotificationContent(notification: SolventaNotification, showReadAction: Boolean) {
+        Row(
+            Modifier.fillMaxWidth().heightIn(min = 88.dp).padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.size(10.dp), contentAlignment = Alignment.Center) {
+                if (!notification.read) Box(Modifier.size(8.dp).background(MaterialTheme.colorScheme.error, CircleShape))
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(notificationName(notification.type), fontWeight = if (notification.read) FontWeight.Normal else FontWeight.Bold)
+                Text(formatDate(notification.createdAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (!notification.read && showReadAction) Text(
+                stringResource(R.string.mark_read),
+                modifier = Modifier.widthIn(max = 116.dp),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.End,
+                maxLines = 2
+            )
         }
+}
+
+@Composable
+private fun PolicyStatusPill(status: PolicyStatus) {
+    val color = when (status) {
+        PolicyStatus.ACTIVE -> SolventaStatusColors.success
+        PolicyStatus.EXPIRING -> SolventaStatusColors.warning
+        PolicyStatus.EXPIRED -> MaterialTheme.colorScheme.error
+    }
+    Surface(color = color.copy(alpha = 0.13f), contentColor = color, shape = RoundedCornerShape(50)) {
+        Text(
+            policyStatusName(status),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
 
 @Composable private fun productName(value: InsuranceProduct) = productLabel(value)

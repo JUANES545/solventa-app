@@ -19,6 +19,8 @@ class NavigationTest {
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.sign_in)).performClick()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.email)).assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.test_user_login)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.demo_credentials)).assertDoesNotExist()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.simulation_notice)).assertDoesNotExist()
     }
 
     @Test
@@ -37,5 +39,7 @@ class NavigationTest {
             composeRule.onAllNodesWithText(homeGreeting).fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithText(homeGreeting).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.nav_notifications)).performClick()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.notifications)).assertIsDisplayed()
     }
 }

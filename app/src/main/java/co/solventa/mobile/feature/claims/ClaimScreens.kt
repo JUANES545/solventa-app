@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
@@ -131,11 +132,13 @@ fun ReviewClaimScreen(viewModel: ClaimViewModel, onBack: () -> Unit, onSubmitted
 fun ClaimResultScreen(viewModel: ClaimViewModel, onClaims: () -> Unit) {
     val state by viewModel.state.collectAsState()
     val claim = (state.submission as? LoadState.Content)?.data
-    Column(Modifier.fillMaxSize().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(72.dp)); Spacer(Modifier.height(20.dp))
-        Text(stringResource(R.string.claim_sent), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        claim?.let { Text(stringResource(R.string.claim_reference, it.id)) }
-        Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.back_to_claims, onClaims); Spacer(Modifier.height(16.dp)); SimulationNotice()
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(Modifier.fillMaxSize().systemBarsPadding().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(72.dp)); Spacer(Modifier.height(20.dp))
+            Text(stringResource(R.string.claim_sent), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            claim?.let { Text(stringResource(R.string.claim_reference, it.id), textAlign = TextAlign.Center) }
+            Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.back_to_claims, onClaims); Spacer(Modifier.height(16.dp)); SimulationNotice()
+        }
     }
 }
 
