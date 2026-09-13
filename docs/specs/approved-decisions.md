@@ -8,7 +8,11 @@ Travel insurance is the complete vertical journey. Products are travel, life, de
 
 ## Authentication
 
-The fixed demo account is `demo@solventa.co` / `Solventa123`. A separate **Enter as test user** action is available. Authentication is simulated behind a repository interface.
+The fixed demo account is Álvaro Mejía, using `alvaro.mejia@solventa.co` / `Solventa123`. The email is prefilled at sign-in, and a separate **Enter as test user** action is available. Registration starts with coherent sample identity data so a moderated test can continue without typing personal information. Authentication is simulated behind a repository interface.
+
+## Date input
+
+All editable dates use the Android calendar picker instead of free-form text. Travel dates prevent past departures and returns before departure; claim event dates prevent future selection.
 
 ## Android integrations
 

@@ -340,9 +340,12 @@ fun RecoveryScreen(onBack: () -> Unit) {
 
 @Composable
 fun RegistrationScreen(onBack: () -> Unit, onContinue: () -> Unit) {
-    var name by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var document by rememberSaveable { mutableStateOf("") }
+    val defaultName = stringResource(R.string.customer_name)
+    val defaultEmail = stringResource(R.string.customer_email)
+    val defaultDocument = stringResource(R.string.sample_document_number)
+    var name by rememberSaveable { mutableStateOf(defaultName) }
+    var email by rememberSaveable { mutableStateOf(defaultEmail) }
+    var document by rememberSaveable { mutableStateOf(defaultDocument) }
     SolventaScreen(R.string.register_title, onBack) {
         OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.full_name)) }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(email, { email = it }, label = { Text(stringResource(R.string.email)) }, modifier = Modifier.fillMaxWidth())

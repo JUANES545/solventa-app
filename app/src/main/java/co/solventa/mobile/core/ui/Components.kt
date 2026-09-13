@@ -1,17 +1,21 @@
 package co.solventa.mobile.core.ui
 
+import android.app.DatePickerDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.ErrorOutline
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,6 +25,7 @@ import co.solventa.mobile.domain.*
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.format.FormatStyle
+import java.time.ZoneId
 import java.util.Currency
 import java.util.Locale
 
@@ -30,6 +35,7 @@ fun SolventaScreen(
     @StringRes title: Int,
     onBack: (() -> Unit)? = null,
     snackbarHostState: SnackbarHostState? = null,
+    onHome: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Scaffold(
@@ -41,6 +47,11 @@ fun SolventaScreen(
                     if (onBack != null) IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back))
                     }
+                },
+                actions = {
+                    if (onHome != null) IconButton(onClick = onHome) {
+                        Icon(Icons.Rounded.Home, stringResource(R.string.back_to_home))
+                    }
                 }
             )
         }
@@ -50,6 +61,54 @@ fun SolventaScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             content = content
         )
+    }
+}
+
+@Composable
+fun DatePickerField(
+    @StringRes label: Int,
+    value: String,
+    onDateSelected: (String) -> Unit,
+    minDate: LocalDate? = null,
+    maxDate: LocalDate? = null,
+    initialDate: LocalDate = LocalDate.now()
+) {
+    val context = LocalContext.current
+    val selectedDate = value.toLocalDateOrNull()
+    val pickerDate = (selectedDate ?: initialDate).coerceWithin(minDate, maxDate)
+    val openPicker = {
+        DatePickerDialog(
+            context,
+            { _, year, month, day -> onDateSelected(LocalDate.of(year, month + 1, day).toString()) },
+            pickerDate.year,
+            pickerDate.monthValue - 1,
+            pickerDate.dayOfMonth
+        ).apply {
+            minDate?.let { datePicker.minDate = it.toPickerMillis() }
+            maxDate?.let { datePicker.maxDate = it.toPickerMillis() }
+        }.show()
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            stringResource(label),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        OutlinedCard(onClick = openPicker, modifier = Modifier.fillMaxWidth()) {
+            Row(
+                Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    selectedDate?.let { formatDate(it.toString()) } ?: stringResource(R.string.select_date),
+                    modifier = Modifier.weight(1f),
+                    color = if (selectedDate == null) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+                )
+                Icon(Icons.Rounded.CalendarMonth, null, tint = MaterialTheme.colorScheme.primary)
+            }
+        }
     }
 }
 
@@ -168,3 +227,13 @@ fun formatCop(value: Long): String = NumberFormat.getCurrencyInstance(Locale.get
 fun formatDate(value: String): String = runCatching {
     LocalDate.parse(value).format(java.time.format.DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault()))
 }.getOrDefault(value)
+
+fun String.toLocalDateOrNull(): LocalDate? = runCatching { LocalDate.parse(this) }.getOrNull()
+
+private fun LocalDate.coerceWithin(minDate: LocalDate?, maxDate: LocalDate?): LocalDate {
+    if (minDate != null && isBefore(minDate)) return minDate
+    if (maxDate != null && isAfter(maxDate)) return maxDate
+    return this
+}
+
+private fun LocalDate.toPickerMillis(): Long = atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()

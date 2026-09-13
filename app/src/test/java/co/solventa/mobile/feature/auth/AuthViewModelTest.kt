@@ -14,6 +14,12 @@ import org.junit.Test
 class AuthViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
+    @Test fun testUserEmailIsPrefilled() {
+        val viewModel = AuthViewModel(FakeAuthRepository(TestScenarioController()))
+        assertEquals(FakeAuthRepository.DEMO_EMAIL, viewModel.state.value.email)
+        assertTrue(viewModel.state.value.password.isEmpty())
+    }
+
     @Test fun incompleteCredentialsShowValidation() {
         val viewModel = AuthViewModel(FakeAuthRepository(TestScenarioController()))
         viewModel.login()

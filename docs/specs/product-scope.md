@@ -39,7 +39,8 @@ Every primary action must produce a visible result. Simulations must never imply
 
 ## Demo account
 
-- Email: `demo@solventa.co`
+- Customer: Álvaro Mejía
+- Email: `alvaro.mejia@solventa.co`
 - Password: `Solventa123`
 
 Login also provides an **Enter as test user** action. Authentication is handled by a fake repository and covers incomplete input, incorrect credentials, loading, success, and recoverable login error.

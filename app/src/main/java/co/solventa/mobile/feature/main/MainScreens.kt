@@ -152,11 +152,11 @@ fun PolicyCard(policy: Policy, onClick: () -> Unit) {
 }
 
 @Composable
-fun PolicyDetailScreen(policy: Policy, onBack: () -> Unit, onNewClaim: () -> Unit) {
+fun PolicyDetailScreen(policy: Policy, onBack: () -> Unit, onNewClaim: () -> Unit, onHome: () -> Unit) {
     val snackbar = remember { SnackbarHostState() }
     val actionMessage = stringResource(R.string.action_completed)
     val scope = rememberCoroutineScope()
-    SolventaScreen(R.string.policy_detail, onBack, snackbar) {
+    SolventaScreen(R.string.policy_detail, onBack, snackbar, onHome) {
         Text(productName(policy.product), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text(policy.id, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(policyStatusName(policy.status), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)

@@ -19,7 +19,7 @@ class FakeAuthRepository @Inject constructor(
     }
 
     companion object {
-        const val DEMO_EMAIL = "demo@solventa.co"
+        const val DEMO_EMAIL = "alvaro.mejia@solventa.co"
         const val DEMO_PASSWORD = "Solventa123"
     }
 }

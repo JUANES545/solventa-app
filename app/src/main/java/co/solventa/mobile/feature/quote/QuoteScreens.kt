@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import co.solventa.mobile.R
 import co.solventa.mobile.core.ui.*
 import co.solventa.mobile.domain.*
+import java.time.LocalDate
 
 @Composable
 fun ProductScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onTravel: () -> Unit) {
@@ -51,10 +52,27 @@ fun TravelDetailsScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onPlans: 
     var returnDate by rememberSaveable { mutableStateOf(state.details.returnDate) }
     var travelers by rememberSaveable { mutableIntStateOf(state.details.travelers) }
     var showError by rememberSaveable { mutableStateOf(false) }
+    val today = remember { LocalDate.now() }
     SolventaScreen(R.string.travel_details, onBack) {
         OutlinedTextField(destination, { destination = it; showError = false }, label = { Text(stringResource(R.string.destination)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        OutlinedTextField(departure, { departure = it; showError = false }, label = { Text(stringResource(R.string.departure_date)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        OutlinedTextField(returnDate, { returnDate = it; showError = false }, label = { Text(stringResource(R.string.return_date)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        DatePickerField(
+            label = R.string.departure_date,
+            value = departure,
+            onDateSelected = { selected ->
+                departure = selected
+                val selectedReturn = returnDate.toLocalDateOrNull()
+                if (selectedReturn != null && selectedReturn.isBefore(LocalDate.parse(selected))) returnDate = ""
+                showError = false
+            },
+            minDate = today
+        )
+        DatePickerField(
+            label = R.string.return_date,
+            value = returnDate,
+            onDateSelected = { returnDate = it; showError = false },
+            minDate = departure.toLocalDateOrNull() ?: today,
+            initialDate = departure.toLocalDateOrNull() ?: today
+        )
         Text(stringResource(R.string.travelers), fontWeight = FontWeight.SemiBold)
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             OutlinedButton(onClick = { if (travelers > 1) travelers-- }) { Text("−") }
@@ -150,12 +168,15 @@ fun OtpScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onIssued: () -> Uni
 }
 
 @Composable
-fun IssuedScreen(onPolicy: () -> Unit) {
+fun IssuedScreen(onPolicy: () -> Unit, onHome: () -> Unit) {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.fillMaxSize().systemBarsPadding().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(72.dp))
             Spacer(Modifier.height(20.dp)); Text(stringResource(R.string.policy_issued), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-            Text(stringResource(R.string.issued_reference), textAlign = TextAlign.Center); Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.view_policy, onPolicy); Spacer(Modifier.height(16.dp)); SimulationNotice()
+            Text(stringResource(R.string.issued_reference), textAlign = TextAlign.Center)
+            Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.view_policy, onPolicy)
+            OutlinedButton(onClick = onHome, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(stringResource(R.string.back_to_home)) }
+            Spacer(Modifier.height(16.dp)); SimulationNotice()
         }
     }
 }

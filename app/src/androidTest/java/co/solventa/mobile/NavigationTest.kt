@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import co.solventa.mobile.data.FakeAuthRepository
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,6 +19,7 @@ class NavigationTest {
     fun welcomeNavigatesToLogin() {
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.sign_in)).performClick()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.email)).assertIsDisplayed()
+        composeRule.onNodeWithText(FakeAuthRepository.DEMO_EMAIL).assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.test_user_login)).assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.demo_credentials)).assertDoesNotExist()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.simulation_notice)).assertDoesNotExist()

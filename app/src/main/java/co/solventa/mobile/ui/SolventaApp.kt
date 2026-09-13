@@ -56,13 +56,25 @@ fun SolventaApp(settingsViewModel: SettingsViewModel) {
         composable(Route.QUOTE_PLANS) { PlansScreen(quoteViewModel, nav::popBackStack) { nav.navigate(Route.QUOTE_CONSENT) } }
         composable(Route.QUOTE_CONSENT) { QuoteConsentScreen(quoteViewModel, nav::popBackStack) { nav.navigate(Route.PAYMENT) } }
         composable(Route.PAYMENT) { PaymentScreen(quoteViewModel, nav::popBackStack) { nav.navigate(Route.OTP) } }
-        composable(Route.OTP) { OtpScreen(quoteViewModel, nav::popBackStack) { nav.navigate(Route.ISSUED) } }
-        composable(Route.ISSUED) { IssuedScreen { nav.navigate("policy/SOL-TRV-2026-1842") } }
+        composable(Route.OTP) { OtpScreen(quoteViewModel, nav::popBackStack) {
+            nav.navigate(Route.ISSUED) { popUpTo(Route.QUOTE_PRODUCT) { inclusive = true } }
+        } }
+        composable(Route.ISSUED) {
+            IssuedScreen(
+                onPolicy = { nav.navigate("policy/SOL-TRV-2026-1842") { popUpTo(Route.HOME); launchSingleTop = true } },
+                onHome = { navigateHome(nav) }
+            )
+        }
 
         composable(Route.POLICY) { entry ->
             val id = entry.arguments?.getString("id").orEmpty()
             val policy = (mainState.policies as? LoadState.Content)?.data?.firstOrNull { it.id == id } ?: FakeInsuranceRepository.samplePolicies.first()
-            PolicyDetailScreen(policy, nav::popBackStack) { claimViewModel.reset(); nav.navigate(Route.CLAIM_POLICY) }
+            PolicyDetailScreen(
+                policy = policy,
+                onBack = nav::popBackStack,
+                onNewClaim = { claimViewModel.reset(); nav.navigate(Route.CLAIM_POLICY) },
+                onHome = { navigateHome(nav) }
+            )
         }
         composable(Route.CLAIM_DETAIL) { entry ->
             val id = entry.arguments?.getString("id").orEmpty()
@@ -73,7 +85,9 @@ fun SolventaApp(settingsViewModel: SettingsViewModel) {
         composable(Route.CLAIM_EVENT) { ClaimEventScreen(claimViewModel, nav::popBackStack) { nav.navigate(Route.CLAIM_EVIDENCE) } }
         composable(Route.CLAIM_EVIDENCE) { EvidenceScreen(claimViewModel, nav::popBackStack) { nav.navigate(Route.CLAIM_LOCATION) } }
         composable(Route.CLAIM_LOCATION) { LocationScreen(claimViewModel, nav::popBackStack) { nav.navigate(Route.CLAIM_REVIEW) } }
-        composable(Route.CLAIM_REVIEW) { ReviewClaimScreen(claimViewModel, nav::popBackStack) { nav.navigate(Route.CLAIM_RESULT) } }
+        composable(Route.CLAIM_REVIEW) { ReviewClaimScreen(claimViewModel, nav::popBackStack) {
+            nav.navigate(Route.CLAIM_RESULT) { popUpTo(Route.CLAIM_POLICY) { inclusive = true } }
+        } }
         composable(Route.CLAIM_RESULT) { ClaimResultScreen(claimViewModel) { mainViewModel.refresh(); nav.navigate(Route.CLAIMS) { popUpTo(Route.HOME); launchSingleTop = true } } }
 
         if (BuildConfig.DEBUG) composable(Route.SCENARIOS) { ScenarioScreen(nav::popBackStack) }
@@ -82,4 +96,5 @@ fun SolventaApp(settingsViewModel: SettingsViewModel) {
 
 private fun enterMain(nav: NavHostController) = nav.navigate(Route.HOME) { popUpTo(Route.WELCOME) { inclusive = true } }
 private fun logout(nav: NavHostController) = nav.navigate(Route.WELCOME) { popUpTo(nav.graph.id) { inclusive = true } }
+private fun navigateHome(nav: NavHostController) = nav.navigate(Route.HOME) { popUpTo(Route.HOME); launchSingleTop = true }
 private fun navigateBottom(nav: NavHostController, route: String) = nav.navigate(route) { popUpTo(Route.HOME) { saveState = true }; launchSingleTop = true; restoreState = true }

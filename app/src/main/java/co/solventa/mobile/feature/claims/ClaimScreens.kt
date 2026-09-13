@@ -31,6 +31,7 @@ import coil.compose.AsyncImage
 import co.solventa.mobile.R
 import co.solventa.mobile.core.ui.*
 import co.solventa.mobile.domain.*
+import java.time.LocalDate
 
 @Composable
 fun ClaimPolicyScreen(onBack: () -> Unit, onContinue: () -> Unit) = SolventaScreen(R.string.select_policy, onBack) {
@@ -53,7 +54,12 @@ fun ClaimEventScreen(viewModel: ClaimViewModel, onBack: () -> Unit, onContinue: 
     SolventaScreen(R.string.event_information, onBack) {
         Text(stringResource(R.string.claim_type), fontWeight = FontWeight.SemiBold)
         ClaimType.entries.forEach { value -> FilterChip(selected = type == value, onClick = { type = value }, label = { Text(claimTypeLabel(value)) }) }
-        OutlinedTextField(date, { date = it; error = false }, label = { Text(stringResource(R.string.event_date)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        DatePickerField(
+            label = R.string.event_date,
+            value = date,
+            onDateSelected = { date = it; error = false },
+            maxDate = LocalDate.now()
+        )
         OutlinedTextField(description, { description = it; error = false }, label = { Text(stringResource(R.string.description)) }, modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp), minLines = 3)
         if (error) ErrorMessage(R.string.event_fields_error)
         PrimaryButton(R.string.continue_action, {

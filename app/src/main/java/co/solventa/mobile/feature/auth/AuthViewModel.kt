@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 enum class AuthError { REQUIRED_FIELDS, INVALID_CREDENTIALS, NETWORK, SESSION_EXPIRED, UNKNOWN }
 data class AuthUiState(
-    val email: String = "",
+    val email: String = FakeAuthRepository.DEMO_EMAIL,
     val password: String = "",
     val loading: Boolean = false,
     val authenticated: Boolean = false,
