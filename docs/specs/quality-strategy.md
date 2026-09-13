@@ -35,6 +35,12 @@ The final commands will be confirmed when the Android project is generated. The 
 
 Connected tests require an emulator or device and should be reported separately when unavailable.
 
+## Continuous verification
+
+Pull requests to `develop` or `main`, and pushes to `develop`, run unit tests, lint, and compile the debug app and instrumentation tests. A merge into `main` additionally runs the navigation smoke tests on a Gradle Managed Device before signing and publishing the APK. No release may be created if any required verification fails.
+
+Release automation also verifies the APK signature and confirms that its `versionCode` and `versionName` match `version.properties` before publication.
+
 ## Prototype review checklist
 
 - A new evaluator can open and run the project using README instructions.

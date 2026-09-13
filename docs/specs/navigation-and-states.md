@@ -32,6 +32,8 @@ Debug build only
 - Selecting the current bottom destination does not create a duplicate route.
 - Each bottom destination retains scroll position and filters where practical.
 - Completing login or registration clears onboarding from the back stack.
+- Completing policy issuance removes quote and payment steps from the back stack. The confirmation exposes **View policy** and **Back to home**, and Back from the issued policy detail returns to Home.
+- Completing claim submission removes editable claim steps from the back stack so the system Back action cannot resubmit the same draft.
 - Completing logout clears all authenticated routes and session-only data.
 - Deep links and partner routes are not required for the prototype.
 

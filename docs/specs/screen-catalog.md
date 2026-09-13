@@ -16,7 +16,7 @@ This catalog defines the planned screens and meaningful prototype behavior. Mino
 | KYC-04 | Verification result | Finish registration or retry | Approved, pending, recoverable failure |
 | HOME-01 | Home | Open quote, new claim, policy, payment, notification | Loading, content, partial empty, recoverable error |
 | QUOTE-01 | Product selection | Select travel, life, device, or parametric insurance | Selection required |
-| QUOTE-02 | Travel details | Enter destination, departure/return dates, and travelers | Validation, preserved draft |
+| QUOTE-02 | Travel details | Enter destination, select departure/return dates from the Android calendar, and set travelers | Validation, chronological date constraints, preserved draft |
 | QUOTE-03 | Quote consent | Review and authorize Open Finance use | Authorized, declined alternative |
 | QUOTE-04 | Calculation | Wait or cancel | Loading, recoverable error |
 | QUOTE-05 | Quote results | Compare plans, view coverage, select a plan | Content, unavailable result, error |
@@ -31,7 +31,7 @@ This catalog defines the planned screens and meaningful prototype behavior. Mino
 | CLM-01 | Claim list | Open claim, create report | Loading, content, empty, error |
 | CLM-02 | Claim detail | Review timeline, adjuster, provider information | Pending, in review, approved, rejected, closed |
 | CLM-03 | Select affected policy | Choose an eligible policy | Empty eligible-policy state |
-| CLM-04 | Event information | Enter date, type, description | Validation, preserved draft |
+| CLM-04 | Event information | Select the event date from the Android calendar and enter type and description | Validation, no future dates, preserved draft |
 | CLM-05 | Evidence | Use Android Photo Picker, preview and remove selected images | Selection cancelled, unsupported item, picker unavailable |
 | CLM-06 | Location | Request current device location, enter manually, or use demo location | Permission denied, unavailable GPS, location retrieved |
 | CLM-07 | Claim review | Edit sections, submit | Submitting, recoverable error |
