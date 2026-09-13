@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,20 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+
+val appVersion = Properties().apply {
+    rootProject.file("version.properties").inputStream().use(::load)
+}
+val releaseKeystoreFile = providers.environmentVariable("ANDROID_KEYSTORE_FILE").orNull
+val releaseStorePassword = providers.environmentVariable("ANDROID_STORE_PASSWORD").orNull
+val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").orNull
+val releaseKeyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").orNull
+val releaseSigningConfigured = listOf(
+    releaseKeystoreFile,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword
+).all { !it.isNullOrBlank() }
 
 android {
     namespace = "co.solventa.mobile"
@@ -14,14 +30,26 @@ android {
         applicationId = "co.solventa.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = appVersion.getProperty("VERSION_CODE").toInt()
+        versionName = appVersion.getProperty("VERSION_NAME")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            create("release") {
+                storeFile = file(requireNotNull(releaseKeystoreFile))
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -33,6 +61,17 @@ android {
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true; buildConfig = true }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+    testOptions {
+        managedDevices {
+            localDevices {
+                create("ciPhoneApi35") {
+                    device = "Pixel 2"
+                    apiLevel = 35
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
+    }
 }
 
 dependencies {

@@ -43,4 +43,13 @@ Recommended prefixes are `feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `build:
 
 ## Releases
 
-Use semantic versions beginning with the first demonstrable prototype, for example `v0.1.0`. Tags are created from `main` after verification. The exact academic submission version is documented in the release notes.
+Use semantic versions beginning with the first demonstrable prototype, for example `v0.1.0`. The version source is the root `version.properties` file:
+
+- `VERSION_CODE` is a positive Android build number and must increase for every release.
+- `VERSION_NAME` is the public semantic version without the `v` prefix.
+
+Update both values in the corresponding `release/<version>` or `hotfix/<name>` branch before merging it into `main`. Versions must never be reused.
+
+Every push to `main` starts the Android Release workflow. It runs unit tests, lint, instrumentation smoke tests on a Gradle Managed Device, builds and verifies a signed APK, and then creates the `v<VERSION_NAME>` tag and GitHub Release. The release publishes `solventa.apk` and its SHA-256 checksum. A failed verification must stop publication.
+
+Signing material exists only in the GitHub Actions secrets and in the maintainer's protected local backup. Keystores, passwords, reconstructed secret files, and generated APKs must never be committed. The exact academic submission version is documented in the release notes.
