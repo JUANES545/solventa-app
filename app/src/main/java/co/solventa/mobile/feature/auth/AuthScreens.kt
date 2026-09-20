@@ -21,7 +21,6 @@ import androidx.compose.material.icons.rounded.AlternateEmail
 import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Fingerprint
-import androidx.compose.material.icons.rounded.HealthAndSafety
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material.icons.rounded.VisibilityOff
@@ -278,24 +277,6 @@ fun LoginScreen(
                 }
             }
             Spacer(Modifier.height(8.dp))
-        }
-    }
-}
-
-@Composable
-private fun SolventaBrandMark(size: androidx.compose.ui.unit.Dp) {
-    Surface(
-        modifier = Modifier.size(size),
-        shape = RoundedCornerShape(size / 3),
-        color = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                Icons.Rounded.HealthAndSafety,
-                null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(size * 0.62f)
-            )
         }
     }
 }
