@@ -4,6 +4,20 @@
 
 Solventa supports complete light and dark themes. The light theme is the primary presentation and preserves the existing identity of clear backgrounds, dark blue, green confirmations, and red alerts. The dark theme uses the premium corporate direction: deep navy creates trust and financial seriousness, while electric cyan is reserved for high-value actions. The initial preference follows the Android system setting, and the customer may select system, light, or dark in Settings.
 
+## Brand identity
+
+The Solventa symbol combines a shield with an `S`. The shield represents protection and trust. The continuous `S` identifies Solventa without resembling a currency sign. Web, Android, documents, and design files must use the same geometry.
+
+- Light surfaces: Corporate Navy `#123B6D` shield with White `#FFFFFF` letter.
+- Dark surfaces: Electric Cyan `#00D2FF` shield with Deep Ink `#001018` letter.
+- Minimum digital size: `16 dp`.
+- Standard Welcome size: `88 dp`; compact access size: `48 dp`.
+- Clear space: at least one quarter of the symbol width on every side.
+- Do not stretch, rotate, outline, recolor, or add effects to the symbol.
+- Pair the symbol with the `Solventa` name when space permits. Symbol-only controls require an accessible name.
+
+The reusable Compose source is `core/ui/BrandMark.kt`. Adaptive and monochrome launcher artwork uses the same geometry from Android resources.
+
 ## Dark color tokens
 
 | Token | Color | Hex | Intended use |
