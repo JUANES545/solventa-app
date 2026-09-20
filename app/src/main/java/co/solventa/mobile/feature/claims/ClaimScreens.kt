@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import co.solventa.mobile.R
+import co.solventa.mobile.core.designsystem.SolventaStatusColors
 import co.solventa.mobile.core.ui.*
 import co.solventa.mobile.domain.*
 import java.time.LocalDate
@@ -38,7 +39,7 @@ fun ClaimPolicyScreen(onBack: () -> Unit, onContinue: () -> Unit) = SolventaScre
     ElevatedCard(onClick = onContinue, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(stringResource(R.string.international_travel), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text("SOL-TRV-2026-1842"); Text(stringResource(R.string.active), color = MaterialTheme.colorScheme.secondary)
+            Text("SOL-TRV-2026-1842"); Text(stringResource(R.string.active), color = SolventaStatusColors.success)
         }
     }
     PrimaryButton(R.string.continue_action, onContinue)
@@ -140,7 +141,7 @@ fun ClaimResultScreen(viewModel: ClaimViewModel, onClaims: () -> Unit) {
     val claim = (state.submission as? LoadState.Content)?.data
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.fillMaxSize().systemBarsPadding().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(72.dp)); Spacer(Modifier.height(20.dp))
+            Icon(Icons.Rounded.CheckCircle, null, tint = SolventaStatusColors.success, modifier = Modifier.size(72.dp)); Spacer(Modifier.height(20.dp))
             Text(stringResource(R.string.claim_sent), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             claim?.let { Text(stringResource(R.string.claim_reference, it.id), textAlign = TextAlign.Center) }
             Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.back_to_claims, onClaims); Spacer(Modifier.height(16.dp)); SimulationNotice()
