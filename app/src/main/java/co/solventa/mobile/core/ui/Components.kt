@@ -21,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.solventa.mobile.R
+import co.solventa.mobile.core.designsystem.SolventaLayout
+import co.solventa.mobile.core.designsystem.SolventaStatusColors
 import co.solventa.mobile.domain.*
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -57,8 +59,11 @@ fun SolventaScreen(
         }
     ) { padding ->
         Column(
-            Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(
+                horizontal = SolventaLayout.screenHorizontalPadding,
+                vertical = SolventaLayout.screenVerticalPadding
+            ),
+            verticalArrangement = Arrangement.spacedBy(SolventaLayout.sectionGap),
             content = content
         )
     }
@@ -115,6 +120,21 @@ fun DatePickerField(
 @Composable
 fun PrimaryButton(@StringRes label: Int, onClick: () -> Unit, enabled: Boolean = true) {
     Button(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+        Text(stringResource(label))
+    }
+}
+
+@Composable
+fun ConversionButton(@StringRes label: Int, onClick: () -> Unit, enabled: Boolean = true) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = SolventaStatusColors.conversion,
+            contentColor = SolventaStatusColors.onConversion
+        ),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
+    ) {
         Text(stringResource(label))
     }
 }

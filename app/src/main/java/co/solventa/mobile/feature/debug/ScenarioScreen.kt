@@ -29,7 +29,7 @@ fun ScenarioScreen(onBack: () -> Unit, viewModel: ScenarioViewModel = hiltViewMo
             ElevatedCard(onClick = { viewModel.select(value) }, modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth().padding(16.dp)) {
                     RadioButton(selected == value, { viewModel.select(value) })
-                    Column { Text(stringResource(scenarioLabel(value))); if (selected == value) Text(stringResource(R.string.scenario_selected), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary) }
+                    Column { Text(stringResource(scenarioLabel(value))); if (selected == value) Text(stringResource(R.string.scenario_selected), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary) }
                 }
             }
         }

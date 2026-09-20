@@ -159,7 +159,7 @@ fun PolicyDetailScreen(policy: Policy, onBack: () -> Unit, onNewClaim: () -> Uni
     SolventaScreen(R.string.policy_detail, onBack, snackbar, onHome) {
         Text(productName(policy.product), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text(policy.id, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(policyStatusName(policy.status), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
+        Text(policyStatusName(policy.status), style = MaterialTheme.typography.labelLarge, color = policyStatusColor(policy.status))
         SectionTitle(R.string.premium); Text(formatCop(policy.premiumCop), style = MaterialTheme.typography.headlineSmall)
         SectionTitle(R.string.validity); Text("${formatDate(policy.validFrom)} — ${formatDate(policy.validUntil)}")
         SectionTitle(R.string.coverage)
@@ -185,7 +185,7 @@ fun ClaimsScreen(state: LoadState<List<Claim>>, onNew: () -> Unit, onClaim: (Str
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(claimTypeName(claim.type), fontWeight = FontWeight.SemiBold)
                         Text(claim.id, style = MaterialTheme.typography.bodySmall)
-                        Text(claimStatusName(claim.status), color = MaterialTheme.colorScheme.secondary)
+                        Text(claimStatusName(claim.status), color = claimStatusColor(claim.status))
                         Text(formatDate(claim.eventDate), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -199,7 +199,7 @@ fun ClaimsScreen(state: LoadState<List<Claim>>, onNew: () -> Unit, onClaim: (Str
 fun ClaimDetailScreen(claim: Claim, onBack: () -> Unit) = SolventaScreen(R.string.claim_detail, onBack) {
     Text(claimTypeName(claim.type), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
     Text(claim.id)
-    Text(claimStatusName(claim.status), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
+    Text(claimStatusName(claim.status), style = MaterialTheme.typography.labelLarge, color = claimStatusColor(claim.status))
     Text(formatDate(claim.eventDate)); Text(if (claim.type == ClaimType.DELAYED_FLIGHT) stringResource(R.string.delayed_flight_description) else stringResource(R.string.lost_baggage_description))
     HorizontalDivider(); Text(stringResource(R.string.international_travel), fontWeight = FontWeight.SemiBold); Text(claim.policyId)
     SimulationNotice()
@@ -254,11 +254,7 @@ private fun NotificationContent(notification: SolventaNotification, showReadActi
 
 @Composable
 private fun PolicyStatusPill(status: PolicyStatus) {
-    val color = when (status) {
-        PolicyStatus.ACTIVE -> SolventaStatusColors.success
-        PolicyStatus.EXPIRING -> SolventaStatusColors.warning
-        PolicyStatus.EXPIRED -> MaterialTheme.colorScheme.error
-    }
+    val color = policyStatusColor(status)
     Surface(color = color.copy(alpha = 0.13f), contentColor = color, shape = RoundedCornerShape(50)) {
         Text(
             policyStatusName(status),
@@ -267,6 +263,20 @@ private fun PolicyStatusPill(status: PolicyStatus) {
             fontWeight = FontWeight.SemiBold
         )
     }
+}
+
+@Composable
+private fun policyStatusColor(status: PolicyStatus) = when (status) {
+    PolicyStatus.ACTIVE -> SolventaStatusColors.success
+    PolicyStatus.EXPIRING -> SolventaStatusColors.warning
+    PolicyStatus.EXPIRED -> MaterialTheme.colorScheme.error
+}
+
+@Composable
+private fun claimStatusColor(status: ClaimStatus) = when (status) {
+    ClaimStatus.SUBMITTED, ClaimStatus.IN_REVIEW -> SolventaStatusColors.warning
+    ClaimStatus.APPROVED -> SolventaStatusColors.success
+    ClaimStatus.CLOSED -> MaterialTheme.colorScheme.onSurfaceVariant
 }
 
 @Composable private fun productName(value: InsuranceProduct) = productLabel(value)
