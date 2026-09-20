@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.solventa.mobile.R
+import co.solventa.mobile.core.designsystem.SolventaStatusColors
 import co.solventa.mobile.core.ui.*
 import co.solventa.mobile.domain.*
 import java.time.LocalDate
@@ -80,7 +81,7 @@ fun TravelDetailsScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onPlans: 
             OutlinedButton(onClick = { if (travelers < 8) travelers++ }) { Text("+") }
         }
         if (showError) ErrorMessage(R.string.travel_fields_error)
-        PrimaryButton(R.string.calculate_plans, {
+        ConversionButton(R.string.calculate_plans, {
             if (destination.isBlank() || departure.isBlank() || returnDate.isBlank()) showError = true
             else { viewModel.setDetails(destination, departure, returnDate, travelers); viewModel.loadPlans(); onPlans() }
         })
@@ -144,7 +145,7 @@ fun PaymentScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onContinue: () 
             Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { RadioButton(state.paymentSelected, null); Text(stringResource(R.string.payment_method), Modifier.padding(start = 8.dp)) }
         }
         Text(stringResource(R.string.payment_disclaimer), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        PrimaryButton(R.string.continue_action, onContinue, state.paymentSelected)
+        ConversionButton(R.string.continue_action, onContinue, state.paymentSelected)
     }
 }
 
@@ -163,7 +164,7 @@ fun OtpScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onIssued: () -> Uni
             singleLine = true
         )
         if (state.error != null) ErrorMessage(if (state.error == ErrorKind.SUBMISSION) R.string.invalid_otp else R.string.network_error)
-        if (state.issuing) LoadingState() else PrimaryButton(R.string.issue_policy, viewModel::issue, state.otp.length == 6)
+        if (state.issuing) LoadingState() else ConversionButton(R.string.issue_policy, viewModel::issue, state.otp.length == 6)
     }
 }
 
@@ -171,7 +172,7 @@ fun OtpScreen(viewModel: QuoteViewModel, onBack: () -> Unit, onIssued: () -> Uni
 fun IssuedScreen(onPolicy: () -> Unit, onHome: () -> Unit) {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.fillMaxSize().systemBarsPadding().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(72.dp))
+            Icon(Icons.Rounded.CheckCircle, null, tint = SolventaStatusColors.success, modifier = Modifier.size(72.dp))
             Spacer(Modifier.height(20.dp)); Text(stringResource(R.string.policy_issued), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Text(stringResource(R.string.issued_reference), textAlign = TextAlign.Center)
             Spacer(Modifier.height(28.dp)); PrimaryButton(R.string.view_policy, onPolicy)

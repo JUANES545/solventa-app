@@ -7,9 +7,65 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontLoadingStrategy
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
 import androidx.core.view.WindowCompat
+import co.solventa.mobile.R
 import co.solventa.mobile.data.ThemePreference
+
+private val AfacadFlux = FontFamily(
+    variableFont(R.font.afacad_flux_variable, FontWeight.Normal),
+    variableFont(R.font.afacad_flux_variable, FontWeight.Medium),
+    variableFont(R.font.afacad_flux_variable, FontWeight.SemiBold),
+    variableFont(R.font.afacad_flux_variable, FontWeight.Bold),
+    variableFont(R.font.afacad_flux_variable, FontWeight.ExtraBold),
+    variableFont(R.font.afacad_flux_variable, FontWeight.Black)
+)
+
+private val Geologica = FontFamily(
+    variableFont(R.font.geologica_variable, FontWeight.Normal),
+    variableFont(R.font.geologica_variable, FontWeight.Medium),
+    variableFont(R.font.geologica_variable, FontWeight.SemiBold),
+    variableFont(R.font.geologica_variable, FontWeight.Bold),
+    variableFont(R.font.geologica_variable, FontWeight.ExtraBold),
+    variableFont(R.font.geologica_variable, FontWeight.Black)
+)
+
+@OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
+private fun variableFont(resource: Int, weight: FontWeight) = Font(
+    resource,
+    weight,
+    FontStyle.Normal,
+    FontLoadingStrategy.Blocking,
+    FontVariation.Settings(weight, FontStyle.Normal)
+)
+
+private val MaterialTypography = Typography()
+private val SolventaTypography = Typography(
+    displayLarge = MaterialTypography.displayLarge.withFamily(Geologica),
+    displayMedium = MaterialTypography.displayMedium.withFamily(Geologica),
+    displaySmall = MaterialTypography.displaySmall.withFamily(Geologica),
+    headlineLarge = MaterialTypography.headlineLarge.withFamily(Geologica),
+    headlineMedium = MaterialTypography.headlineMedium.withFamily(Geologica),
+    headlineSmall = MaterialTypography.headlineSmall.withFamily(Geologica),
+    titleLarge = MaterialTypography.titleLarge.withFamily(Geologica),
+    titleMedium = MaterialTypography.titleMedium.withFamily(Geologica),
+    titleSmall = MaterialTypography.titleSmall.withFamily(Geologica),
+    bodyLarge = MaterialTypography.bodyLarge.withFamily(AfacadFlux),
+    bodyMedium = MaterialTypography.bodyMedium.withFamily(AfacadFlux),
+    bodySmall = MaterialTypography.bodySmall.withFamily(AfacadFlux),
+    labelLarge = MaterialTypography.labelLarge.withFamily(AfacadFlux),
+    labelMedium = MaterialTypography.labelMedium.withFamily(AfacadFlux),
+    labelSmall = MaterialTypography.labelSmall.withFamily(AfacadFlux)
+)
+
+private fun TextStyle.withFamily(family: FontFamily) = copy(fontFamily = family)
 
 private val LightColors = lightColorScheme(
     primary = Color(0xFF123B6D), onPrimary = Color.White,
@@ -50,8 +106,10 @@ private val DarkColors = darkColorScheme(
 )
 
 object SolventaStatusColors {
+    val conversion @Composable get() = if (MaterialTheme.colorScheme.background == DarkColors.background) Color(0xFF00D2FF) else Color(0xFF007FA3)
+    val onConversion @Composable get() = if (MaterialTheme.colorScheme.background == DarkColors.background) Color(0xFF001018) else Color.White
     val success @Composable get() = MaterialTheme.colorScheme.tertiary
-    val warning @Composable get() = if (MaterialTheme.colorScheme.background == DarkColors.background) Color(0xFFF59E0B) else Color(0xFFB45309)
+    val warning @Composable get() = if (MaterialTheme.colorScheme.background == DarkColors.background) Color(0xFFF59E0B) else Color(0xFFA44708)
 }
 
 @Composable
@@ -78,6 +136,6 @@ fun SolventaTheme(
     CompositionLocalProvider(
         LocalDensity provides Density(currentDensity.density, currentDensity.fontScale * if (largeText) 1.15f else 1f)
     ) {
-        MaterialTheme(colorScheme = if (dark) DarkColors else LightColors, typography = Typography(), content = content)
+        MaterialTheme(colorScheme = if (dark) DarkColors else LightColors, typography = SolventaTypography, content = content)
     }
 }

@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.solventa.mobile.R
+import co.solventa.mobile.core.designsystem.SolventaStatusColors
 import co.solventa.mobile.core.ui.*
 
 @Composable
@@ -313,7 +314,7 @@ fun RecoveryScreen(onBack: () -> Unit) {
     SolventaScreen(R.string.recovery_title, onBack) {
         Text(stringResource(R.string.recovery_help))
         OutlinedTextField(email, { email = it; sent = false }, label = { Text(stringResource(R.string.email)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        if (sent) Text(stringResource(R.string.recovery_sent), color = MaterialTheme.colorScheme.secondary)
+        if (sent) Text(stringResource(R.string.recovery_sent), color = SolventaStatusColors.success)
         PrimaryButton(R.string.send_instructions, { sent = true }, email.isNotBlank())
         SimulationNotice()
     }
@@ -370,7 +371,7 @@ fun KycScreen(onBack: () -> Unit, onFinished: () -> Unit) {
         OutlinedButton(onClick = { selfieCaptured = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
             Text(if (selfieCaptured) "✓ ${stringResource(R.string.capture_selfie)}" else stringResource(R.string.capture_selfie))
         }
-        if (documentCaptured && selfieCaptured) Text(stringResource(R.string.kyc_approved), color = MaterialTheme.colorScheme.secondary)
+        if (documentCaptured && selfieCaptured) Text(stringResource(R.string.kyc_approved), color = SolventaStatusColors.success)
         PrimaryButton(R.string.finish_registration, onFinished, documentCaptured && selfieCaptured)
     }
 }
